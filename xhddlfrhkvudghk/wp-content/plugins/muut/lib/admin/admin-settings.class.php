@@ -73,8 +73,8 @@ if ( !class_exists( 'Muut_Admin_Settings' ) ) {
 		 */
 		public function addActions() {
 			add_action( 'load-toplevel_page_' . Muut::SLUG, array( $this, 'saveSettings' ) );
-			add_action( 'load-toplevel_page_' . Muut::SLUG, array( $this, 'maybeShowS3RemoveNotice' ), 9 );
 			add_action( 'admin_notices', array( $this, 'prepareAdminNotices' ), 9 );
+			add_action( 'admin_notices', array( $this, 'maybeShowReviewRequestNotice' ), 8 );
 			add_action( 'admin_print_scripts', array( $this, 'printJsFieldNames') );
 		}
 
@@ -153,35 +153,40 @@ if ( !class_exists( 'Muut_Admin_Settings' ) ) {
 		 */
 		protected function settingsValidate( $settings ) {
 
-			if ( isset( $_POST['initial_save'] ) ) {
-				return apply_filters( 'muut_settings_initial_save', apply_filters( 'muut_settings_validated', $settings ) );
+			if ( !isset( $_POST['initial_save'] ) || !$_POST['initial_save'] ) {
+
+				$boolean_settings = apply_filters( 'muut_boolean_settings', array(
+					'replace_comments',
+					'use_threaded_commenting',
+					'override_all_comments',
+					'is_threaded_default',
+					'show_online_default',
+					'allow_uploads_default',
+					'subscription_use_signed_setup',
+					'use_custom_s3_bucket',
+					'subscription_use_sso',
+					'enable_proxy_rewrites',
+					'use_webhooks',
+				) );
+
+				foreach ( $boolean_settings as $boolean_setting ) {
+					$settings[$boolean_setting] = isset( $settings[$boolean_setting] ) ? $settings[$boolean_setting] : '0';
+				}
+
+				if ( ( isset( $settings['forum_name'] ) && $settings['forum_name'] != muut()->getForumName() )
+					|| ( isset( $settings['enable_proxy_rewrites'] ) && $settings['enable_proxy_rewrites'] != muut()->getOption( 'enable_proxy_rewrites' ) )
+					|| ( isset( $settings['use_custom_s3_bucket'] ) && $settings['use_custom_s3_bucket'] != muut()->getOption( 'use_custom_s3_bucket' ) )
+					|| ( isset( $settings['custom_s3_bucket_name'] ) && $settings['custom_s3_bucket_name'] != muut()->getOption( 'custom_s3_bucket_name' ) )
+					|| ( isset( $settings['use_webhooks'] ) && $settings['use_webhooks'] != muut()->getOption( 'use_webhooks' ) )
+				) {
+					flush_rewrite_rules( true );
+				}
+
+				// If the Secret Key setting does not get submitted (i.e. is disabled), make sure to erase its value.
+				$settings['subscription_secret_key'] = isset( $settings['subscription_secret_key'] ) ? $settings['subscription_secret_key'] : '';
+			} else {
+				$settings = apply_filters( 'muut_settings_initial_save', $settings );
 			}
-
-			$boolean_settings = apply_filters( 'muut_boolean_settings', array(
-				'replace_comments',
-				'use_threaded_commenting',
-				'override_all_comments',
-				'is_threaded_default',
-				'show_online_default',
-				'allow_uploads_default',
-				'subscription_use_sso',
-				'enable_proxy_rewrites',
-				'use_webhooks',
-			) );
-
-			foreach ( $boolean_settings as $boolean_setting ) {
-				$settings[$boolean_setting] = isset( $settings[$boolean_setting]) ? $settings[$boolean_setting] : '0';
-			}
-
-			if ( ( isset( $settings['forum_name'] ) && $settings['forum_name'] != muut()->getForumName() )
-				|| ( isset( $settings['enable_proxy_rewrites'] ) && $settings['enable_proxy_rewrites'] != muut()->getOption( 'enable_proxy_rewrites' ) )
-				|| ( isset( $settings['use_webhooks'] ) && $settings['use_webhooks'] != muut()->getOption( 'use_webhooks' ) )
-			) {
-				flush_rewrite_rules( true );
-			}
-
-			// If the Secret Key setting does not get submitted (i.e. is disabled), make sure to erase its value.
-			$settings['subscription_secret_key'] = isset( $settings['subscription_secret_key']) ? $settings['subscription_secret_key'] : '';
 
 			foreach ( $settings as $name => &$value ) {
 				$value = apply_filters( 'muut_validate_setting_' . $name, $value );
@@ -251,7 +256,6 @@ if ( !class_exists( 'Muut_Admin_Settings' ) ) {
 		public function validateSettings( $value, $name ) {
 			switch( $name ) {
 				//This first case is deprecated and should no longer be used. Delete after next release.
-				//TODO: Delete after next release.
 				case 'custom_s3_bucket_name':
 					$value = trim( $value );
 					$submitted_settings = $this->getSubmittedSettings();
@@ -286,14 +290,14 @@ if ( !class_exists( 'Muut_Admin_Settings' ) ) {
 				case 'forum_name':
 					$value = trim( $value );
 					// Make sure the forum name has no whitespace.
-					$valid = Muut_Field_Validation::validateHasNoWhitespace( $value );
+					$valid = Muut_Field_Validation::validateHasNoWhitespace( $value ) && Muut_Field_Validation::validateNoRegexEscaping( $value, array('-') );
 
 					if ( !$valid ) {
 						$error_args = array(
 							'name' => $name,
-							'message' => __( 'Forum name must contain no spaces of any kind. Make sure the forum name is the name you registered with Muut when you set up the forum.', 'muut' ),
+							'message' => __( 'Forum name must contain no spaces or special characters of any kind. Make sure the forum name is the name you registered with Muut when you set up the forum.', 'muut' ),
 							'field' => 'muut_forum_name',
-							'new_value' => $value,
+							'new_value' => stripslashes($value),
 							'old_value' => muut()->getForumName(),
 						);
 						$this->addErrorToQueue( $error_args );
@@ -394,12 +398,13 @@ if ( !class_exists( 'Muut_Admin_Settings' ) ) {
 		 * @author Paul Hughes
 		 * @since 3.0.2
 		 */
-		public function maybeShowS3RemoveNotice() {
+		/* COMMENTED OUT IN 3.0.2.3 when s3 was re-added
+		 * public function maybeShowS3RemoveNotice() {
 			if ( muut()->getOption( 'removed_s3_support' ) ) {
-				muut()->queueAdminNotice( 'updated', __("S3 bucket preferences have beem removed in this version in the interests of simpler and better SEO; don't worry, it's a good thing!", 'muut' ) );
+				muut()->queueAdminNotice( 'updated', __("S3 bucket preferences have been removed in this version in the interests of simpler and better SEO; don't worry, it's a good thing!", 'muut' ) );
 				muut()->deleteOption( 'removed_s3_support' );
 			}
-		}
+		}*/
 
 		/**
 		 * Queues the admin notices generated here to the main Muut admin notices renderer.
@@ -412,6 +417,29 @@ if ( !class_exists( 'Muut_Admin_Settings' ) ) {
 			$error_queue = array_reverse( $this->errorQueue );
 			foreach( $error_queue as $name => $error ) {
 				muut()->queueAdminNotice( 'error', $error['message'] );
+			}
+		}
+
+		/**
+		 * Displays the dismissible admin notice requesting a review.
+		 *
+		 * @return void
+		 * @author Paul Hughes
+		 * @since 3.0.2.3
+		 */
+		public function maybeShowReviewRequestNotice() {
+			$dismissed_notices = muut()->getOption( 'dismissed_notices', array() );
+			if ( !isset( $dismissed_notices['review_request'] ) || !$dismissed_notices['review_request'] ) {
+				$update_timestamps = muut()->getOption( 'update_timestamps', array() );
+				$update_time = !empty( $update_timestamps ) ? array_pop( $update_timestamps ) : false;
+
+				//if ( $update_time && ( time() - $update_time > 604800 ) ) {
+					echo '<div class="updated muut_admin_notice" id="muut_dismiss_review_request_notice">';
+					wp_nonce_field( 'muut_dismiss_notice', 'dismiss_nonce' );
+					echo '<span style="float: right" class="dismiss_notice_button"><a href="#" class="dismiss_notice">X</a></span>';
+					echo '<p>' . sprintf( __( 'Enjoying Muut? We\'d love it you would pop over to the %splugin page%s and leave a rating and review!', 'muut' ), '<a class="dismiss_notice" target="_blank" href="https://wordpress.org/plugins/muut/">', '</a>' ) . '</p>';
+					echo '</div>';
+				//}
 			}
 		}
 	}

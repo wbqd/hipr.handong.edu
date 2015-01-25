@@ -8,7 +8,7 @@
     background-color:transparent !important;
     padding:0 !important;
     box-shadow: none !important;
-    visibility: visible !important;
+    
     
 }
 #wpgmza_map img { box-shadow: none !important; }
@@ -40,10 +40,8 @@
 .wpgmza_markerbox strong,
 .wpgmza_markerbox p,
 .wpgmza_markerbox br {
-    padding-left:0 !important;
-    padding-right:0 !important;
-    margin-left:0 !important;
-    margin-right:0 !important;
+    margin:2px;
+    padding:1px;
     color:#000 !important;
 }
 
@@ -55,23 +53,23 @@
     width:42px;
 }
 
-.wpgmaps_mlist_marker {
+.wpgmza_table .wpgmaps_mlist_marker {
     width:32px;
     height:32px;
     vertical-align:top;
     padding:0 !important;
 }
 
-.wpgmaps_mlist_info {
+.wpgmza_table .wpgmaps_mlist_info {
     vertical-align:top;
     text-align:left;
     padding:0 !important;
     
 }
-.wpgmaps_mlist_row {
+.wpgmza_table .wpgmaps_mlist_row {
     cursor:pointer;
 }
-.wpgmaps_mlist_row:hover {
+.wpgmza_table .wpgmaps_mlist_row:hover {
     background-color: #EEEEEE;
     
 }
@@ -100,12 +98,14 @@
         padding-bottom: 15px !important;
         padding-right: 10px !important;
         border: 0 !important;
+        
 }
 .wpgmza_table tr { border: 0 !important; }
 .wpgmza_table th {
 	text-align: left !important;
         padding-bottom: 15px !important;
         border: 0 !important;
+        min-width:100px;    
 }
 
 .wpgmza_table_description {
@@ -201,6 +201,7 @@
         float:left;
         display:block;
         width:150px;
+        clear:left;
     }
     .wpgmza_sl_query_innerdiv2 {
         display:block;
@@ -255,3 +256,13 @@
 .wpgmza_sl_search_button {
 
 }
+.wpgmza_marker_approval_msg { font-weight: bold; }
+
+.scrollFix {
+    line-height: 1.35;
+}
+.wpgmza_infowindow_description { white-space: normal; }
+.wpgmza_infowindow_title { white-space: normal; }
+.wpgmza_infowindow_address { white-space: normal; }
+.wpgmza_infowindow_title { font-weight: bold; }
+.gm-style-iw div {overflow:visible !important;}

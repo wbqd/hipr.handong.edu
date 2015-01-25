@@ -1,55 +1,84 @@
 (function( $ ) {
-	var gglcptch_match = true;
 	$( document ).ready(function() {
-		$( '#recaptcha_widget_div' ).parent().children( 'input:submit' ).click(function() {
-			click_trigger();
-			return gglcptch_match;
+		$( '#recaptcha_widget_div #recaptcha_response_field' ).live( 'input paste change', function() {
+			$error = $( this ).parents( '#recaptcha_widget_div' ).next( '#gglcptch_error' );
+			if( $error.length ) {
+				$error.remove();
+			}
 		});
-		$( '#cntctfrm_contact_form, #cntctfrmpr_contact_form' ).find( 'input:submit' ).click(function() {
-			click_trigger();
-			return gglcptch_match;
+		$( 'form' ).submit( function( e ) {
+			var $form = $( this ),
+				$captcha = $form.find( '#recaptcha_widget_div:visible' ),
+				$captcha_v2 = $form.find( '.g-recaptcha:visible' );				
+			if ( $captcha.length ) {
+				$.ajax({
+					async   : false,
+					cache   : false,
+					type    : 'POST',
+					url     : ajaxurl,
+					headers : {
+						'Content-Type' : 'application/x-www-form-urlencoded'
+					},
+					data    : {
+						action: 'gglcptch_captcha_check',
+						recaptcha_challenge_field : $( '#recaptcha_challenge_field' ).val(),
+						recaptcha_response_field  : $( '#recaptcha_response_field' ).val()
+					},
+					success : function( data ) {
+						if ( data == 'error' ) {
+							if ( $captcha.next( '#gglcptch_error' ).length == 0 ) {
+								$captcha.after( '<label id="gglcptch_error">' + gglcptch_error_msg + '</label>' );
+							}
+							$( '#recaptcha_reload' ).trigger( 'click' );
+							e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+							return false;
+						}
+					},
+					error: function( request, status, error ) {
+						if ( $captcha.next( '#gglcptch_error' ).length == 0 ) {
+							$captcha.after( '<label id="gglcptch_error">' + request.status + ' ' + error + '</label>' );
+						}
+						$( '#recaptcha_reload' ).trigger( 'click' );
+						e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+						return false;
+					}
+				});
+				$( '#recaptcha_reload' ).trigger( 'click' );
+			} else if ( $captcha_v2.length ) {
+				$.ajax({
+					async   : false,
+					cache   : false,
+					type    : 'POST',
+					url     : ajaxurl,
+					headers : {
+						'Content-Type' : 'application/x-www-form-urlencoded'
+					},
+					data    : {
+						action: 'gglcptch_captcha_check',
+						'g-recaptcha-response'  : $form.find( '.g-recaptcha-response' ).val()
+					},
+					success : function( data ) {
+						if ( data == 'error' ) {
+							if ( $captcha_v2.next( '#gglcptch_error' ).length == 0 ) {
+								$captcha_v2.after( '<label id="gglcptch_error">' + gglcptch_error_msg + '</label>' );
+								$( "#gglcptch_error" ).fadeOut( 4000, function() {
+									$( "#gglcptch_error" ).remove();
+								});
+								$( 'html, body' ).animate({ scrollTop: $captcha_v2.offset().top - 50 }, 500);
+							}
+							e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+							return false;
+						}
+					},
+					error: function( request, status, error ) {
+						if ( $captcha_v2.next( '#gglcptch_error' ).length == 0 ) {
+							$captcha_v2.after( '<label id="gglcptch_error">' + request.status + ' ' + error + '</label>' );
+						}
+						e.preventDefault ? e.preventDefault() : (e.returnValue = false);
+						return false;
+					}
+				});
+			}
 		});
 	});
-
-	function click_trigger() {
-		var req = getXmpHttp();
-		/* fields for checking Google Captcha */
-		var recaptcha_challenge_field = $( '#recaptcha_challenge_field' ).val();
-		var recaptcha_response_field = $( '#recaptcha_response_field' ).val();
-		/* opening asynchronous connection */
-		req.open( 'POST', gglcptch_path, false );
-		req.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
-		/* sending POST parameters */
-		req.send( 'recaptcha_challenge_field=' + recaptcha_challenge_field + '&recaptcha_response_field=' + recaptcha_response_field );
-		
-		if ( req.responseText == 'error' ) {
-			/* wrong captcha */
-			if ( ! $( '#gglcptch_error' ).text() ) {
-				$( '#recaptcha_widget_div' ).after( '<label id="gglcptch_error" style="color:#f00;">' + gglcptch_error_msg + '</label>' );
-				gglcptch_match = false;
-			}
-			$('#recaptcha_reload').click();
-		} else {
-			/* correct catcha */
-			gglcptch_match = true;
-		}
-	}
-
-	/* Creating xmlhttp object */
-	function getXmpHttp() {
-		var xmlhttp;
-		try {
-			xmlhttp = new ActiveXObject( 'Msxml2.XMLHTTP' );
-		} catch ( e ) {
-			try {
-				xmlhttp = new ActiveXObject( 'Microsoft.XMLHTTP' );
-			} catch ( E ) {
-				xmlhttp = false;
-			}
-		}
-		if ( ! xmlhttp && typeof XMLHttpRequest != 'undefined' ) {
-			xmlhttp = new XMLHttpRequest();
-		}
-		return xmlhttp;
-	}
 })(jQuery);

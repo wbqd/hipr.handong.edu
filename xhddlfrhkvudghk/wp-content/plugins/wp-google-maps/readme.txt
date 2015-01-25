@@ -1,17 +1,17 @@
 === WP Google Maps ===
 Contributors: WPGMaps
 Donate link: http://www.wpgmaps.com
-Tags: google maps, maps, map, map markers, google, google map, wp maps, wp google maps, wp google map, easy map, store locator, map plugin, directions, map directions, google map plugin, routes, polygons, polylines, streetview, location, marker, latitude, longitude
+Tags: google maps, maps, map, map markers, google, google map, wp maps, wp google maps, wp google map, easy map, store locator, map plugin, directions, map directions, google map plugin, routes, polygons, polylines, streetview, location, marker, latitude, longitude, map widget
 Requires at least: 3.5
-Tested up to: 4.0
+Tested up to: 4.1
 Stable tag: trunk
 License: GPLv2
 
-The easiest to use Google maps plugin! Create custom maps with high quality markers containing locations, categories, descriptions, images and links.
+The easiest to use Google maps plugin! Create a custom Google map with high quality markers containing categories, descriptions, images and links.
 
 == Description ==
 
-The easiest to use Google maps plugin! Add your customized Google map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss. No iFrames and super easy to use! Perfect for contact pages, coverage maps and any other use you can think of!
+The easiest to use Google maps plugin! Add a customized Google map to your WordPress posts and/or pages quickly and easily with the supplied shortcode. No fuss. No iFrames and super easy to use! Perfect for contact page maps, routes, maps showing delivery areas and any other use you can think of!
 
 While the free version of WP Google Maps allows you to create a Google map with as many markers as you like, the Pro version allows you to do so much more! 
 
@@ -49,6 +49,7 @@ The [WP Google Maps Pro Version](http://www.wpgmaps.com/purchase-professional-ve
 * Filter markers by category
 * Mashup multiple Google maps
 * Add different marker icons, or your own icons to make your map really stand out!
+* List your Google Map markers in the three ways; Basic listing, Carousel, Advanced Table
 * Allow your visitors to get directions to your markers.
 * Export/Import your markers to a CSV file for quick editing.
 * Link Fusion tables to your Google Maps
@@ -65,14 +66,18 @@ Get a free copy of the WP Google Maps Pro version in exchange for translating ou
 * English - default
 * Russian
 * German
+* French (Arnaud Thomas)
 * Polish (Michal Kotnowski)
 * Finnish (Johanna Joutti)
 * Dutch (Jan Wind)
 * Hebrew (Gal Dotan)
+* Danish (Patrick Jepsen)
+* Italian (Tommaso Mori & Massimo Bregani)
+* Croatian (Sven Kopun)
+* Romanian (Cosmin Stroe)
+* Spanish (Carmelo Villegas Cruz)
+* Brazilian Portuguese (Roberto Costa)
 * Czechoslovakian^
-* Spanish^
-* French^
-* Italian^
 * Swedish^
 
 ^Language file needs to be updated
@@ -142,13 +147,50 @@ In order to show your custom Google map on your page or post, simply copy the sh
 6. WP Google Maps Pro version: General settings page
 7. WP Google Maps Pro version: Export/Import your map markers
 8. WP Google Maps Pro version: Advanced Google map options.
+9. WP Google Maps Pro version: Responsive carousel map marker listing
 
 == Upgrade Notice ==
 
-= 5.05 =
-This is a must for users on IIS. Older WP Google Maps versions will not be compatible.
+= 6.0.27 =
+Please upgrade your version of WP Google Maps to version 6.0.27 as it includes multiple security improvements.
 
 == Changelog ==
+
+= 6.1.2 2015-01-19 Low priority =
+* Code improvements (PHP warnings)
+* New languages added
+* Tested in WordPress 4.1
+
+= 6.1.1 2014-12-19 Low priority =
+* Translation file updates
+* Code improvements
+
+= 6.1.0 2014-12-17 Medium priority =
+* Added an alternative method to pull the marker data
+
+= 6.0.31 2014-11-28 Low priority =
+* Fixed a category bug
+
+= 6.0.30 2014-11-26 =
+* Added a check for the DOMDocument class when creating the map marker data files
+* Removed the APC Object Cache warning
+* Added new strings to the PO file
+
+= 6.0.29 2014-11-04 =
+* New option: You can now show or hide the Store Locator bouncing icon
+* New feature: Add custom CSS in the settings page
+* Code improvements
+
+= 6.0.28 2014-10-22 =
+* Enfold / Avia theme conflict resolved (Google Maps API loading twice)
+* Better marker file/directory control
+* Italian translation added (Tommaso Mori)
+
+= 6.0.27 2014-09-29 =
+* French translation updated by Arnaud Thomas
+* Security updates (thank you www.htbridge.com)
+* Code improvements (PHP warnings)
+* Google Map Store Locator bug fix - map zoom levels on 300km, 150km and 75km were incorrect
 
 = 6.0.26 2014-08-22 =
 * Attempting to fix the "is_dir" and "open_basedir restriction" errors some users are experiencing.

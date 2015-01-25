@@ -49,19 +49,23 @@ jQuery(document).ready( function($) {
   $.fn.check_requires_fields = function() {
     var requires_element = $( '#' + this.data('muut_requires') );
     var requires_function = $( this ).data('muut_require_func');
-    requires_element.on('change keydown', { parent: requires_element, passed_function: requires_function, current: this }, this.set_requires_fields );
+    var requires_true_cb = $(this).data('muut_require_true_cb');
+    var requires_false_cb = $(this).data('muut_require_false_cb');
+    requires_element.on('change keydown', { parent: requires_element, passed_function: requires_function, current: this, true_cb: requires_true_cb, false_cb: requires_false_cb }, this.set_requires_fields );
     requires_element.change();
   };
 
   // Should not be called directly, is used by the check_requires_fields function (above).
   $.fn.set_requires_fields = function( event ) {
     var passed_function = event.data.passed_function;
+    var true_cb = event.data.true_cb;
+    var false_cb = event.data.false_cb;
     var parent = event.data.parent;
     var current = event.data.current;
     if ( eval( 'parent.' + passed_function ) ) {
-      current.removeClass( 'hidden' );
+      eval( 'current.' + true_cb );
     } else {
-      current.addClass( 'hidden' );
+      eval( 'current.' + false_cb );
     }
   };
 
@@ -72,7 +76,8 @@ jQuery(document).ready( function($) {
   var check_all_requires_fields = function() {
     $('body.toplevel_page_muut tr[data-muut_requires], ' +
       'body.toplevel_page_muut th[data-muut_requires], ' +
-      'body.toplevel_page_muut .muut_requires_input_block').each(function(){
+      'body.toplevel_page_muut .muut_requires_input_block, ' +
+      '.requires_signed_embed').each(function(){
       $(this).check_requires_fields();
     });
   };
@@ -110,14 +115,6 @@ jQuery(document).ready( function($) {
     }
   }
 
-  // Upgrade to developer links should open the upgrade window.
-  // OUT OF DATE: Now just opens new window/tab.
-  /*$('a.muut_upgrade_to_developer_link').on('click', function(e){
-    var muut_upgrade_url = 'https://muut.com/account/#' + $('#muut_forum_name').val();
-    window.open(muut_upgrade_url,"","width=1000,height=750,status=0,scrollbars=0,menubar=0");
-    e.preventDefault();
-  });*/
-
   $('input.muut_autoselect').on('focus', function(e) {
     $(this).blur();
     $(this).select();
@@ -129,6 +126,32 @@ jQuery(document).ready( function($) {
       $('#TB_ajaxContent').css('width', 'auto');
     }, 1);
   };
+
+  /** Function for dismissing a given admin notice **/
+  var muut_dismiss_notice = function( notice_el, notice_name ) {
+      var data = {
+        action: 'dismiss_notice',
+        security: $(notice_el).find('input[name="dismiss_nonce"]').val(),
+        dismiss: true,
+        notice_name: notice_name
+      };
+
+      $.post( ajaxurl, data, function(response) {
+        $(notice_el).hide('slow');
+      });
+  };
+
+  /** Dismiss the Review Request popup on link click to do so **/
+  var review_request_notice = $('#muut_dismiss_review_request_notice');
+  review_request_notice.on('click', '.dismiss_notice', function(e) {
+    muut_dismiss_notice( review_request_notice, 'review_request');
+  });
+
+  /** Dismiss the upgrade notice **/
+  var muut_update_notice = $('#muut_update_notice');
+  muut_update_notice.on('click', '.dismiss_notice', function(e) {
+    muut_dismiss_notice( muut_update_notice, 'update_notice');
+  });
 
   // Resize thickbox for the settings webhooks integration box.
   $('.muut_settings_finish_webhook_setup').on('click', function() {

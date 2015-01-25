@@ -26,7 +26,7 @@ if ( !class_exists( 'Muut' ) ) {
 		/**
 		 * The current version of Muut
 		 */
-		const VERSION = '3.0.2.2';
+		const VERSION = '3.0.3.1';
 
 		/**
 		 * The version of Muut this was released with.
@@ -161,6 +161,8 @@ if ( !class_exists( 'Muut' ) ) {
 			add_action( 'admin_init', array( $this, 'runActivationFunctions' ) );
 
 			add_action( 'admin_notices', array( $this, 'renderAdminNotices' ), 50 );
+			add_action( 'admin_notices', array( $this, 'maybeShowUpdateNotice' ) );
+
 			add_action( 'flush_rewrite_rules_hard', array( $this, 'removeRewriteAdded' ) );
 
 			add_action( 'init', array( $this, 'registerScriptsAndStyles' ) );
@@ -170,6 +172,9 @@ if ( !class_exists( 'Muut' ) ) {
 
 			add_action( 'wp_print_scripts', array( $this, 'printCurrentPageJs' ) );
 			add_action( 'wp_footer', array( $this, 'printHiddenMuutDiv' ) );
+
+			add_action( 'wp_ajax_dismiss_notice', array( $this, 'ajaxDismissNotice' ) );
+
 		}
 
 		/**
@@ -344,7 +349,7 @@ if ( !class_exists( 'Muut' ) ) {
 					'<IfModule mod_rewrite.c>',
 					'RewriteEngine On',
 					'RewriteBase /',
-					'RewriteRule ^i/(' . $this->getForumName() . ')(/.*)?$ ' . $this->getProxyContentServer() . '/$1$2 [P]',
+					'RewriteRule ^i/(' . preg_quote( $this->getForumName() ) . ')(/.*)?$ ' . $this->getProxyContentServer() . '/$1$2 [P]',
 					'RewriteRule ^m/(.*)$ http://' . self::MUUTSERVERS . '/m/$1 [P]',
 					'</IfModule>',
 				);
@@ -371,7 +376,7 @@ if ( !class_exists( 'Muut' ) ) {
 		public function addProxyRewritesFilter( $rules ) {
 			$permastruct = get_option( 'permalink_structure', '' );
 
-			$muut_rules = "RewriteRule ^i/(" . $this->getForumName() . ")(/.*)?\$ " . $this->getProxyContentServer() . "/\$1\$2 [P]\n";
+			$muut_rules = "RewriteRule ^i/(" . preg_quote( $this->getForumName() ) . ")(/.*)?\$ " . $this->getProxyContentServer() . "/\$1\$2 [P]\n";
 			$muut_rules .=	"RewriteRule ^m/(.*)$ http://" . self::MUUTSERVERS . "/m/\$1 [P]";
 
 			if ( $permastruct == '' ) {
@@ -421,12 +426,10 @@ if ( !class_exists( 'Muut' ) ) {
 			if ( apply_filters( 'use_https_for_proxy', false ) ) {
 				$proxy_server = 'https://';
 			}
-			/** REMOVED S3 Bucket proxying support starting in version 3.0.2. Is not useful and can hinder SEO. */
-			/*$proxy_server .= ( $this->getOption( 'use_custom_s3_bucket' ) && $this->getOption( 'custom_s3_bucket_name' ) != '' && !$force_muut_server )
+			/** RE-ADDED S3 Bucket proxying support starting in version 3.0.2.3. Previously REMOVED in 3.0.2 */
+			$proxy_server .= ( $this->getOption( 'use_custom_s3_bucket' ) && $this->getOption( 'custom_s3_bucket_name' ) != '' && !$force_muut_server )
 				? $this->getOption( 'custom_s3_bucket_name' )
 				: self::MUUTSERVERS . '/i';
-			*/
-			$proxy_server .= self::MUUTSERVERS . '/i';
 
 			return apply_filters( 'muut_proxy_server', $proxy_server );
 		}
@@ -611,11 +614,12 @@ if ( !class_exists( 'Muut' ) ) {
 				),
 				'subscription_api_key' => '',
 				'subscription_secret_key' => '',
+				'subscription_use_signed_setup' => '0',
 				'subscription_use_sso' => false,
 				'enable_proxy_rewrites' => '1',
 				'use_custom_s3_bucket' => '0',
 				'custom_s3_bucket_name' => '',
-				'comments_base_domain' => $_SERVER['SERVER_NAME'],
+				'comments_base_domain' => substr( get_home_url( null, null, 'http' ), 7),
 				'activation_timestamp' => '0',
 				'use_webhooks' => '0',
 				'webhooks_secret' => '',
@@ -676,22 +680,22 @@ if ( !class_exists( 'Muut' ) ) {
 		 * @since 3.0
 		 */
 		public function enqueueAdminScripts() {
+			wp_enqueue_script( 'muut-admin-functions' );
+			wp_enqueue_style( 'muut-admin-style' );
+
 			$screen = get_current_screen();
 			if ( $screen->id == 'page'
 				|| $screen->id == 'widgets'
 				|| $screen->id == self::SLUG . '_page_muut_settings'
 				|| $screen->id == 'toplevel_page_muut' ) {
-				wp_enqueue_script( 'muut-admin-functions' );
-				wp_enqueue_style( 'muut-admin-style' );
+				// Nothing special anymore.
 			}
 
 
 			if ( $screen->id == self::SLUG . '_page_muut_custom_navigation' ) {
-				wp_enqueue_script( 'muut-admin-functions' );
 				wp_enqueue_script( 'jquery-ui-sortable' );
 				wp_enqueue_script( 'x-editable' );
 				wp_enqueue_style( 'x-editable-style' );
-				wp_enqueue_style( 'muut-admin-style' );
 			}
 
 			// Enqueue the font on all admin pages for the menu icon.
@@ -726,7 +730,7 @@ if ( !class_exists( 'Muut' ) ) {
 		 * @since 3.0
 		 */
 		public function printCurrentPageJs() {
-			if ( !is_admin() && get_post() ) {
+			if ( $this->needsMuutResources() || ( !is_admin() && get_post() ) ) {
 				echo '<script type="text/javascript">';
 				echo 'var muut_object;';
 				echo 'if ( typeof ajaxurl == "undefined" ) { var ajaxurl = "' . admin_url('admin-ajax.php') . '"; }';
@@ -1241,6 +1245,49 @@ if ( !class_exists( 'Muut' ) ) {
 			$upgrade_link = $forum_name ? 'https://muut.com/account/#' . $forum_name : 'https://muut.com/pricing/';
 
 			return $upgrade_link;
+		}
+
+		/**
+		 * Dismisses an admin notice.
+		 *
+		 * @return void
+		 * @author Paul Hughes
+		 * @since 3.0.3
+		 */
+		public function ajaxDismissNotice() {
+			check_ajax_referer( 'muut_dismiss_notice', 'security' );
+			if ( isset( $_POST['dismiss'] ) && $_POST['dismiss'] && isset( $_POST['notice_name'] ) && is_string( $_POST['notice_name'] ) ) {
+				$notice_name = addslashes( $_POST['notice_name'] );
+				$dismissed_notices = (array) $this->getOption( 'dismissed_notices', array() );
+				$dismissed_notices[$notice_name] = true;
+				muut()->setOption( 'dismissed_notices', $dismissed_notices );
+			}
+			die();
+		}
+
+		/**
+		 * Displays the dismissible admin notice regarding the latest update.
+		 *
+		 * @return void
+		 * @author Paul Hughes
+		 * @since 3.0.3
+		 */
+		public function maybeShowUpdateNotice() {
+			$dismissed_notices = muut()->getOption( 'dismissed_notices', array() );
+			if ( !isset( $dismissed_notices['update_notice'] ) || !$dismissed_notices['update_notice'] ) {
+				$forum_page_id = Muut_Post_Utility::getForumPageId();
+				if ( $forum_page_id ) {
+					echo '<div class="updated muut_admin_notice" id="muut_update_notice">';
+					wp_nonce_field( 'muut_dismiss_notice', 'dismiss_nonce' );
+					echo '<span class="dismiss_notice_button"><a href="#" class="dismiss_notice">X</a></span>';
+					echo '<p>' . sprintf( __( 'The %sMuut Plugin%s update to version 3.0.3 revised the default Forum Template (just a little!). You might want to head over to your %sForum Page%s and make sure it all looks as you expect! Check the post on our %sWordPress support forum%s about the latest release for details or help.', 'muut' ), '<b>', '</b>', '<a href="' . get_permalink( $forum_page_id ) . '">', '</a>', '<a target="_blank" href="https://muut.com/forum/#!/wordpress">', '</a>' ) . '</p>';
+					echo '<p>' . __( 'Happy Muuting! :-)' ) . '</p>';
+					echo '</div>';
+				} else {
+					$dismissed_notices['update_notice'] = true;
+					muut()->setOption( 'dismissed_notices', $dismissed_notices );
+				}
+			}
 		}
 	}
 	/**

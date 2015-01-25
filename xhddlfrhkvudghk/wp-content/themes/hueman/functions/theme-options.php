@@ -209,6 +209,15 @@ function custom_theme_options() {
 			'section'		=> 'blog',
 			'min_max_step'	=> '0,10,1'
 		),
+		// Blog: Standard
+		array(
+			'id'		=> 'blog-standard',
+			'label'		=> 'Standard Blog List',
+			'desc'		=> 'Show one post per row, image beside text',
+			'std'		=> 'off',
+			'type'		=> 'on-off',
+			'section'	=> 'blog'
+		),
 		// Blog: Thumbnail Placeholder
 		array(
 			'id'		=> 'placeholder',
@@ -286,6 +295,15 @@ function custom_theme_options() {
 				)
 			)
 		),
+		// Header: Ads
+		array(
+			'id'		=> 'header-ads',
+			'label'		=> 'Header Ads',
+			'desc'		=> 'Header widget ads area',
+			'std'		=> 'off',
+			'type'		=> 'on-off',
+			'section'	=> 'header'
+		),
 		// Header: Custom Logo
 		array(
 			'id'		=> 'custom-logo',
@@ -302,6 +320,15 @@ function custom_theme_options() {
 			'std'		=> 'on',
 			'type'		=> 'on-off',
 			'section'	=> 'header'
+		),
+		// Footer: Ads
+		array(
+			'id'		=> 'footer-ads',
+			'label'		=> 'Footer Ads',
+			'desc'		=> 'Footer widget ads area',
+			'std'		=> 'off',
+			'type'		=> 'on-off',
+			'section'	=> 'footer'
 		),
 		// Footer: Widget Columns
 		array(
@@ -727,6 +754,15 @@ function custom_theme_options() {
 					'src'		=> get_template_directory_uri() . '/functions/images/col-3cr.png'
 				)
 			)
+		),
+		// Sidebars: Sidebar Top Boxes
+		array(
+			'id'		=> 'sidebar-top',
+			'label'		=> 'Sidebar Top Boxes',
+			'desc'		=> 'Boxes at the top of the sidebars',
+			'std'		=> 'on',
+			'type'		=> 'on-off',
+			'section'	=> 'sidebars'
 		),
 		// Sidebars: Create Areas
 		array(

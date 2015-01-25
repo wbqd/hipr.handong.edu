@@ -2,8 +2,8 @@
 Contributors: PaulHughes01, tipiirai, jannelehtinen
 Tags: forum, commenting, comments, social, realtime, discussion, widgets
 Requires at least: 3.7
-Tested up to: 4.0
-Stable tag: 3.0.2.2
+Tested up to: 4.1
+Stable tag: 3.0.3.1
 License: MIT
 License URI: https://github.com/moot/wordpress/blob/master/LICENSE.txt
 
@@ -45,9 +45,9 @@ Whether you’re setting up for the first time or have just updated to the new v
 * _Discussion Channel_ – You can now embed a single specific channel in your website’s sidebar. Users can watch and join the discussion without having to stop browsing the rest of your website.
 * _My Feed_ – By using the My Feed widget, users can keep track of all the activity on all the discussions they’ve joined and postes they’ve made right in your website’s sidebars.
 
-The recently introduced Webhooks feature of Muut forums makes the Latest Comments and Trending Posts widgets possible, so that means that those two widgets will only work on forums that have a Developer subscription (the others are good to go with any forum!).
+The recently introduced Webhooks feature of Muut forums makes the Latest Comments and Trending Posts widgets possible, so that means that those two widgets will only work on forums that have a Small or Medium subscription (the others are good to go with any forum!). See our [pricing page](https://muut.com/pricing/) for details.
 
-You can find more information about Muut at our [website](https://muut.com) and read the full [plugin documentation](https://muut.com/docs/wordpress.html).
+You can find more information about Muut at our [website](https://muut.com) and read the full [plugin documentation](https://muut.com/help/#wordpress).
 
 == Installation ==
 
@@ -90,6 +90,9 @@ There are several great ways to learn more about and get help with the plugin. T
 
 == Upgrade Notice ==
 
+= 3.0.3 =
+The update to version 3.0.3 is mainly an update for compatibility with 4.1 and Twenty-Fifteen.
+
 = 3.0.2 =
 The update to version 3.0.2 is mostly a feature update, focusing on the five added widgets.
 
@@ -100,6 +103,45 @@ The update to version 3.0.1 is a small update with a couple big fixes and better
 The update to version 3.0 is a major update that enhances the plugin experience in a large way. The update _does_ support all of the earlier plugin functionality (such as the shortcodes), but we recommend updating when you have a little bit of time to experiment and ensure that everything continues to work as expected. We hope you enjoy the new version!
 
 == Changelog ==
+
+= 3.0.3.1 =
+Notes
+
+* Added filter `muut_latest_comments_show_avatar` to allow not-showing the avatars in the Latest Comments widget; defaults to true.
+
+Bug Fixes
+
+* Fixed some errors with the Latest Comments widget such that not all posts necessarily were being registered as changing, such as if domain name was changing.
+
+= 3.0.3 =
+Features, UX, Improvements
+
+* Added support for new WordPress Twenty-Fifteen theme.
+* Updated default Forum Template.
+* Added "old" directory under templates to house older template versions for reference.
+
+Notes
+
+* Added filter for Federated Identity user avatar `muut_fedid_user_avatar_url`. Filters avatar URL and passes User ID and User object as arguments.
+
+Bug Fixes
+
+* Forum name more strictly validated, to prevent corrupted .htaccess file.
+* Fixed PHP Notice that displays when shortcodes are being used.
+
+= 3.0.2.3 =
+Features, UX, Improvements
+
+* Added back the Custom S3 Bucket Support.
+* Added support for signed embeds separate from SSO/Federated Identities (for secure embedding).
+
+Notes
+
+* Webhooks: 'post' webhook now also stores the body content (replies already were).
+
+Bug Fixes
+
+* Various small fixes.
 
 = 3.0.2.2 =
 Bug Fixes
