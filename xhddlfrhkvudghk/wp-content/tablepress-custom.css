@@ -1,0 +1,16 @@
+.profile td {
+/* your CSS */
+	text-align: left !important;
+	vertical-align: middle !important;
+	line-height: 100% !important;
+}
+
+.profile .column-1 {
+	vertical-align: top !important;
+	width: 105px !important;
+}
+
+.profile .column-2 {
+	font-weight: bold !important;
+	width: 140px !important;
+}

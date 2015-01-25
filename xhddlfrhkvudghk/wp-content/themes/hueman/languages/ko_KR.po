@@ -1,0 +1,164 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Hueman\n"
+"POT-Creation-Date: 2014-09-24 00:00+0900\n"
+"PO-Revision-Date: 2014-09-24 00:00+0900\n"
+"Last-Translator: Joshua Jung <wbqdinno@gmail.com>\n"
+"Language-Team: \n"
+"Language: Korean\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.3\n"
+"X-Poedit-KeywordsList: __;_e\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Poedit-SearchPath-0: ..\n"
+
+#: ../404.php:14
+msgid ""
+"The page you are trying to reach does not exist, or has been moved. Please "
+"use the menus or the search box to find what you are looking for."
+msgstr ""
+"방문하려는 페이지가 존재하지 않거나 삭제되었습니다. "
+"메뉴 혹은 검색창을 사용해서 원하는 내용을 찾아주세요."
+
+#: ../comments.php:7
+msgid "No Responses"
+msgstr "코멘트가 없습니다"
+
+#: ../comments.php:7
+msgid "1 Response"
+msgstr "코멘트가 1 개 있습니다"
+
+#: ../comments.php:7
+msgid "% Responses"
+msgstr "코멘트가 % 개 있습니다"
+
+#: ../comments.php:10
+msgid "Comments"
+msgstr "코멘트"
+
+#: ../comments.php:11
+msgid "Trackbacks &amp; Pingbacks"
+msgstr "트랙백 &amp; 핑백"
+
+#: ../footer.php:67
+msgid "All Rights Reserved."
+msgstr "판권 소유."
+
+#: ../footer.php:73
+msgid "Powered by"
+msgstr "Powered by"
+
+#: ../footer.php:73
+msgid "Theme by"
+msgstr "Theme by"
+
+#: ../search.php:10
+msgid "For the term"
+msgstr "검색어를 입력하세요."
+
+#: ../search.php:12
+msgid "Please try another search:"
+msgstr "다른 검색어를 입력해주세요."
+
+#: ../searchform.php:3
+msgid "To search type and hit enter"
+msgstr "검색할 내용을 입력하고 엔터를 치세요."
+
+#: ../sidebar-2.php:5 ../sidebar.php:9
+msgid "Expand Sidebar"
+msgstr "사이드바 확장"
+
+#: ../sidebar-2.php:10
+msgid "More"
+msgstr "더 보기"
+
+#: ../sidebar.php:14
+msgid "Follow:"
+msgstr "팔로우:"
+
+#: ../single.php:14
+msgid "by"
+msgstr "by"
+
+#: ../single.php:23
+msgid "Pages:"
+msgstr "페이지:"
+
+#: ../single.php:35
+msgid "Tags:"
+msgstr "태그:"
+
+#: ../functions/widgets/alx-tabs.php:27
+msgid "Recent Posts"
+msgstr "최근 글"
+
+#: ../functions/widgets/alx-tabs.php:28
+msgid "Popular Posts"
+msgstr "인기 글"
+
+#: ../functions/widgets/alx-tabs.php:29
+msgid "Recent Comments"
+msgstr "최근 코멘트"
+
+#: ../functions/widgets/alx-tabs.php:30
+msgid "Tags"
+msgstr "태그"
+
+#: ../functions/widgets/alx-tabs.php:185
+msgid "says:"
+msgstr "says:"
+
+#: ../inc/page-title.php:19
+msgid "Search results"
+msgstr "검색결과"
+
+#: ../inc/page-title.php:22
+msgid "Error 404."
+msgstr "404 에러."
+
+#: ../inc/page-title.php:22
+msgid "Page not found!"
+msgstr "페이지가 없습니다."
+
+#: ../inc/page-title.php:26
+msgid "Author:"
+msgstr "작성자："
+
+#: ../inc/page-title.php:29
+msgid "Category:"
+msgstr "분류："
+
+#: ../inc/page-title.php:32
+msgid "Tagged:"
+msgstr "태그："
+
+#: ../inc/page-title.php:35
+msgid "Daily Archive:"
+msgstr "일별 아카이브:"
+
+#: ../inc/page-title.php:38
+msgid "Monthly Archive:"
+msgstr "월별 아카이브:"
+
+#: ../inc/page-title.php:41
+msgid "Yearly Archive:"
+msgstr "년별 아카이브:"
+
+#: ../inc/post-nav.php:3
+msgid "Next story"
+msgstr "다음 글"
+
+#: ../inc/post-nav.php:4
+msgid "Previous story"
+msgstr "이전 글"
+
+#: ../inc/related-posts.php:6
+msgid "You may also like..."
+msgstr "이런 글은 어떠세요?"
+
+#: ../inc/sharrre.php:2
+msgid "Share"
+msgstr "공유"
